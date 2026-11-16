@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#102b50">
+<title>GCE Command Centre</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--navy:#102b50;--blue:#1d5c91;--sky:#eaf4ff;--ink:#172638;--muted:#607286;--line:#dce5ef;--bg:#f4f7fb;--green:#16845b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:linear-gradient(135deg,#102b50,#1d5c91);color:white;padding:22px 18px 25px;border-radius:0 0 22px 22px}
+header .eyebrow{font-size:11px;letter-spacing:1.5px;opacity:.8;font-weight:700}h1{font-size:25px;margin:7px 0 2px}header p{margin:0;color:#d8eaff;font-size:13px}
+main{max-width:760px;margin:auto;padding:14px 13px 90px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:white;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:12px;box-shadow:0 3px 12px #18345408}
+.card h2{font-size:16px;margin:0 0 10px}.muted{color:var(--muted);font-size:12px}.count{font-size:22px;font-weight:800;color:var(--navy);margin:4px 0}.countsmall{font-size:13px;color:var(--muted)}
+.pill{display:inline-block;background:var(--sky);color:var(--blue);font-size:11px;font-weight:800;padding:5px 8px;border-radius:20px}
+label{display:block;font-size:12px;font-weight:700;margin:10px 0 5px;color:#40546a}
+input,select,textarea{width:100%;padding:11px;border:1px solid #cbd7e4;border-radius:10px;background:#fff;font:inherit;color:var(--ink)}
+textarea{min-height:68px;resize:vertical}
+button{border:0;border-radius:10px;padding:11px 14px;background:var(--navy);color:white;font-weight:700;font-size:13px;cursor:pointer}
+button.secondary{background:#eaf1f8;color:var(--navy)}button.danger{background:#fff0f0;color:#a32b2b}
+button.small{padding:7px 9px;font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:5}
+nav button{background:transparent;color:var(--muted);padding:8px 5px;font-size:11px;flex:1}nav button.active{color:var(--blue);background:var(--sky)}
+section.page{display:none}section.page.active{display:block}
+.item{padding:10px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}
+.item:first-of-type{border-top:0}.item strong{font-size:13px}.item small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.notice{background:#fff8e7;border:1px solid #f1dfad;padding:10px;border-radius:10px;font-size:12px;line-height:1.5}
+.good{color:var(--green);font-weight:700}.empty{color:var(--muted);font-size:13px;padding:12px 0}
+.checkrow{display:flex;align-items:center;gap:8px}.checkrow input{width:auto}
+@media(min-width:600px){main{padding-top:20px}.grid{gap:14px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="eyebrow">UPPER SIXTH SCIENCE • BAMENDA</div>
+ <h1>GCE COMMAND CENTRE</h1>
+ <p>22+ POINTS MISSION · Your study reminders, timetable and exam countdown</p>
+</header>
+<main>
+<section id="home" class="page active">
+ <div class="card">
+  <div class="pill">YOUR DAILY MISSION</div>
+  <h2 id="greeting" style="margin-top:10px">Hello, Atekem</h2>
+  <div class="muted" id="today"></div>
+  <p style="margin-bottom:0">Small, focused study sessions build strong examination results. Keep moving.</p>
+ </div>
+ <div class="grid">
+  <div class="card">
+   <div class="pill">PAPER 3 PRACTICALS</div>
+   <div class="count" id="prMonths">Calculating…</div>
+   <div class="countsmall" id="prDays"></div>
+   <div class="muted">4–26 May 2027</div>
+  </div>
+  <div class="card">
+   <div class="pill">WRITTEN EXAMS</div>
+   <div class="count" id="wrMonths">Calculating…</div>
+   <div class="countsmall" id="wrDays"></div>
+   <div class="muted">1–17 June 2027</div>
+  </div>
+ </div>
+ <div class="card">
+  <h2>Today's school timetable</h2><div id="todayClasses" class="empty">No subjects entered for today yet. Add your timetable in the Timetable section.</div>
+ </div>
+ <div class="card">
+  <h2>Upcoming assignments</h2><div id="upcomingTasks" class="empty">No assignments added yet.</div>
+ </div>
+ <div class="card">
+  <h2>Quick actions</h2>
+  <div class="actions"><button onclick="showPage('tasks')">＋ Add assignment</button><button class="secondary" onclick="showPage('timetable')">＋ Add timetable</button></div>
+ </div>
+</section>
+
+<section id="alarms" class="page">
+ <div class="card">
+  <h2>Daily voice reminders</h2>
+  <p class="muted">Your selected times are saved on this device. Each exam announcement reads the months-and-days countdown and then the total days.</p>
+  <div id="alarmList"></div>
+  <label>Change a reminder time</label>
+  <select id="alarmPick"><option value="0">Early morning · 03:30</option><option value="1">Midday · 12:00</option><option value="2">Evening · 19:30</option><option value="3">Night · 21:30</option></select>
+  <input id="alarmTime" type="time" value="03:30">
+  <div class="actions"><button onclick="saveAlarm()">Save time</button><button class="secondary" onclick="testVoice()">Test voice</button></div>
+ </div>
+ <div class="card">
+  <h2>Voice and notification setup</h2>
+  <label>Voice</label><select id="voiceChoice"><option value="female">Prefer English female voice</option><option value="any">Any available English voice</option></select>
+  <div class="actions"><button onclick="enableNotifications()">Enable notifications</button><button class="secondary" onclick="speakCountdown()">Hear countdown now</button></div>
+  <p class="muted" id="voiceStatus">The phone's text-to-speech engine supplies the voice. An offline English voice must be installed in Android settings for offline speech.</p>
+ </div>
+ <div class="notice"><strong>Alarm reliability note:</strong> For this web-app version, keep the app open or in a browser tab for timed voice alarms. Android may pause web pages in the background or after closing the browser. Notifications and speech are not guaranteed when the browser is force-stopped. We will test this on your Spark 40 before relying on it.</div>
+</section>
+
+<section id="timetable" class="page">
+ <div class="card">
+  <h2>My weekly school timetable</h2>
+  <p class="muted">You can fill this in later when you send your actual class timetable.</p>
+  <label>Day</label><select id="classDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+  <label>Subject</label><select id="classSubject"><option>Physics</option><option>Chemistry</option><option>Mathematics with Mechanics</option><option>Computer Science</option><option>Biology</option><option>Other</option></select>
+  <label>Start time</label><input id="classStart" type="time">
+  <label>End time</label><input id="classEnd" type="time">
+  <label>Room / note (optional)</label><input id="classNote" placeholder="e.g. Laboratory">
+  <div class="actions"><button onclick="addClass()">Add to timetable</button></div>
+ </div>
+ <div class="card"><h2>Saved weekly timetable</h2><div id="classList" class="empty">Your timetable is empty. Add subjects above whenever you're ready.</div></div>
+</section>
+
+<section id="tasks" class="page">
+ <div class="card">
+  <h2>Add an assignment or task</h2>
+  <label>Subject</label><select id="taskSubject"><option>Chemistry</option><option>Physics</option><option>Mathematics with Mechanics</option><option>Computer Science</option><option>Biology</option><option>Other</option></select>
+  <label>What do you need to do?</label><input id="taskTitle" placeholder="e.g. Complete organic chemistry exercises">
+  <label>Due date</label><input id="taskDate" type="date">
+  <label>Alarm time</label><input id="taskTime" type="time" value="20:00">
+  <label>Extra details (optional)</label><textarea id="taskNote" placeholder="Page numbers, exercise numbers, instructions…"></textarea>
+  <div class="actions"><button onclick="addTask()">Save assignment</button></div>
+ </div>
+ <div class="card"><h2>Pending and completed tasks</h2><div id="taskList" class="empty">No tasks saved yet.</div></div>
+</section>
+
+<section id="settings" class="page">
+ <div class="card">
+  <h2>Personal settings</h2>
+  <label>Name used in spoken reminders</label><input id="userName" value="Atekem Ndikum">
+  <label>Daily motivation</label><select id="motivation"><option value="mix">Rotate motivational messages and study tips</option><option value="quote">Motivational messages</option><option value="tip">Study tips</option></select>
+  <div class="actions"><button onclick="saveSettings()">Save settings</button></div>
+ </div>
+ <div class="card">
+  <h2>Backup and restore</h2>
+  <p class="muted">Your data is stored on this phone. Export a backup before changing phones or clearing browser data.</p>
+  <div class="actions"><button onclick="exportData()">Export backup</button><button class="secondary" onclick="document.getElementById('restoreFile').click()">Restore backup</button><input id="restoreFile" type="file" accept="application/json" style="display:none" onchange="importData(event)"></div>
+ </div>
+ <div class="card">
+  <h2>About offline use</h2>
+  <p class="muted">After the app has been installed and opened once while online, its main screens can be cached for offline use. Timetable and task data are stored locally. Online synchronization between devices is not enabled in this free first version; backup/restore is available instead.</p>
+ </div>
+</section>
+</main>
+<nav>
+ <button class="active" data-page="home" onclick="showPage('home')">⌂<br>Home</button>
+ <button data-page="alarms" onclick="showPage('alarms')">◷<br>Alarms</button>
+ <button data-page="timetable" onclick="showPage('timetable')">▦<br>Timetable</button>
+ <button data-page="tasks" onclick="showPage('tasks')">✓<br>Tasks</button>
+ <button data-page="settings" onclick="showPage('settings')">⚙<br>Settings</button>
+</nav>
+<script>
+const KEY='gceCommandCentre_v1';
+const defaults={name:'Atekem Ndikum',alarms:['03:30','12:00','19:30','21:30'],classes:[],tasks:[],lastAlarm:{},motivation:'mix',voice:'female'};
+let data=load();
+function load(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return {...defaults}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function showPage(id){document.querySelectorAll('section.page').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));}
+function dateOnly(s){return new Date(s+'T00:00:00')}
+function diffParts(target){let now=new Date();let end=dateOnly(target);let d=Math.max(0,Math.ceil((end.setHours(0,0,0,0)-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/86400000));let m=0, cursor=new Date(now.getFullYear(),now.getMonth(),now.getDate());while(true){let next=new Date(cursor);next.setMonth(next.getMonth()+1);if(next<=dateOnly(target)){cursor=next;m++}else break}let days=Math.max(0,Math.round((dateOnly(target)-cursor)/86400000));return {m,days,total:d}}
+function countdownText(label,target){let p=diffParts(target);return `${label}: ${p.m} months and ${p.days} days remaining. That is ${p.total} days until the examination begins.`}
+function renderCountdown(){let p=diffParts('2027-05-04'),w=diffParts('2027-06-01');document.getElementById('prMonths').textContent=`${p.m} months, ${p.days} days`;document.getElementById('prDays').textContent=`${p.total} days remaining`;document.getElementById('wrMonths').textContent=`${w.m} months, ${w.days} days`;document.getElementById('wrDays').textContent=`${w.total} days remaining`}
+const quotes=['Progress is built one focused session at a time.','Do not fear a difficult topic; break it into smaller questions.','Consistency today makes examination day less frightening.','Understand the principle, practise the method, then test yourself.'];
+const tips=['Study actively: close your notes and explain the idea from memory.','For calculations, write the formula, substitute values, then include units.','Review mistakes. Every corrected mistake is a lesson learned.','Use past questions to practise applying what you know.'];
+function announcement(){let n=data.name||'Atekem';let q=quotes[new Date().getDate()%quotes.length],t=tips[new Date().getDate()%tips.length];return `Good day, ${n}. ${countdownText('Your practical examinations', '2027-05-04')} ${countdownText('Your written examinations','2027-06-01')} ${q} Study tip: ${t}`;}
+function speak(text){if(!('speechSynthesis'in window)){alert('Speech output is not supported by this browser.');return}speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text);u.lang='en-GB';let voices=speechSynthesis.getVoices();let en=voices.filter(v=>/^en/i.test(v.lang));let female=en.find(v=>/female|woman|samantha|victoria|zira|serena|karen|moira/i.test(v.name));u.voice=(data.voice==='female'&&female)?female:(en[0]||null);u.rate=.92;u.pitch=1.05;speechSynthesis.speak(u)}
+function speakCountdown(){speak(announcement())}
+function testVoice(){speak(`Hello ${data.name}. This is your GCE Command Centre voice reminder. Your alarms and study tasks are ready to be configured.`)}
+function notify(title,body){if('Notification'in window&&Notification.permission==='granted'){try{new Notification(title,{body,icon:'icon-192.png',tag:'gce-'+title})}catch(e){}}}
+function enableNotifications(){if(!('Notification'in window)){alert('This browser does not support notifications.');return}Notification.requestPermission().then(p=>{document.getElementById('voiceStatus').textContent=p==='granted'?'Notifications enabled. Keep the app active for scheduled alarms.':'Notifications were not enabled.';})}
+function saveAlarm(){let i=+document.getElementById('alarmPick').value;data.alarms[i]=document.getElementById('alarmTime').value;save();alert('Reminder time saved.')}
+function renderAlarms(){let labels=['Early morning','Midday','Evening','Night'];document.getElementById('alarmList').innerHTML=data.alarms.map((v,i)=>`<div class="item"><div><strong>${labels[i]}</strong><small>${v}</small></div><span class="pill">Daily</span></div>`).join('')}
+function addClass(){let c={day:classDay.value,subject:classSubject.value,start:classStart.value,end:classEnd.value,note:classNote.value};if(!c.start||!c.end){alert('Please enter the subject start and end times.');return}data.classes.push(c);save();classNote.value=''}
+function renderClasses(){let el=document.getElementById('classList');if(!data.classes.length){el.className='empty';el.textContent='Your timetable is empty. Add subjects above whenever you are ready.';return}el.className='';el.innerHTML=data.classes.map((c,i)=>`<div class="item"><div><strong>${c.day}: ${c.subject}</strong><small>${c.start}–${c.end} ${c.note||''}</small></div><button class="danger small" onclick="removeClass(${i})">Remove</button></div>`).join('')}
+function removeClass(i){data.classes.splice(i,1);save()}
+function addTask(){let t={subject:taskSubject.value,title:taskTitle.value.trim(),date:taskDate.value,time:taskTime.value,note:taskNote.value,done:false,id:Date.now()};if(!t.title||!t.date||!t.time){alert('Please enter the assignment, due date and alarm time.');return}data.tasks.push(t);save();taskTitle.value='';taskNote.value=''}
+function renderTasks(){let el=document.getElementById('taskList');if(!data.tasks.length){el.className='empty';el.textContent='No tasks saved yet.';return}el.className='';let sorted=[...data.tasks].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));el.innerHTML=sorted.map(t=>`<div class="item"><div><strong>${t.done?'✓ ':''}${escapeHtml(t.subject)} · ${escapeHtml(t.title)}</strong><small>${t.date} at ${t.time} ${t.done?'· Completed':''}</small></div><div class="actions"><button class="secondary small" onclick="toggleTask(${t.id})">${t.done?'Undo':'Done'}</button><button class="danger small" onclick="deleteTask(${t.id})">Delete</button></div></div>`).join('')}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toggleTask(id){let t=data.tasks.find(x=>x.id===id);if(t)t.done=!t.done;save()}
+function deleteTask(id){data.tasks=data.tasks.filter(x=>x.id!==id);save()}
+function renderHome(){let now=new Date(),day=now.toLocaleDateString('en-GB',{weekday:'long'});greeting.textContent='Hello, '+(data.name||'Atekem');today.textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});let cs=data.classes.filter(c=>c.day===day).sort((a,b)=>a.start.localeCompare(b.start));todayClasses.innerHTML=cs.length?cs.map(c=>`<div class="item"><div><strong>${escapeHtml(c.subject)}</strong><small>${c.start}–${c.end}</small></div></div>`).join(''):'No subjects entered for today yet.';let ts=data.tasks.filter(t=>!t.done).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,4);upcomingTasks.innerHTML=ts.length?ts.map(t=>`<div class="item"><div><strong>${escapeHtml(t.subject)} · ${escapeHtml(t.title)}</strong><small>${t.date} at ${t.time}</small></div></div>`).join(''):'No pending assignments.'}
+function render(){renderCountdown();renderAlarms();renderClasses();renderTasks();renderHome();userName.value=data.name;voiceChoice.value=data.voice;motivation.value=data.motivation}
+function saveSettings(){data.name=userName.value.trim()||'Atekem Ndikum';data.voice=voiceChoice.value;data.motivation=motivation.value;save();alert('Settings saved.')}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='gce-command-centre-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data={...defaults,...JSON.parse(r.result)};save();alert('Backup restored.')}catch(err){alert('That backup file could not be read.')}};r.readAsText(f)}
+function checkAlarms(){let now=new Date(),today=now.toISOString().slice(0,10),hm=now.toTimeString().slice(0,5);data.alarms.forEach((time,i)=>{let key='daily'+i;if(hm===time&&data.lastAlarm[key]!==today){data.lastAlarm[key]=today;localStorage.setItem(KEY,JSON.stringify(data));let msg=announcement();notify('GCE Command Centre',msg);speak(msg)}});data.tasks.forEach(t=>{let key='task'+t.id;if(!t.done&&t.date===today&&t.time===hm&&data.lastAlarm[key]!==today){data.lastAlarm[key]=today;localStorage.setItem(KEY,JSON.stringify(data));let msg=`Hello ${data.name}. I'm reminding you about your ${t.subject} assignment: ${t.title}. It is scheduled for now.`;notify('Assignment reminder',msg);speak(msg)}})}
+function start(){render();if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});setInterval(checkAlarms,15000);if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=()=>{};}
+start();
+</script>
+</body></html>

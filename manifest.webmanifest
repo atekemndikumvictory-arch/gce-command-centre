@@ -1,0 +1,10 @@
+{
+  "name": "GCE Command Centre",
+  "short_name": "GCE Centre",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#102b50",
+  "description": "Offline-first GCE A-Level countdown, timetable and assignment reminders.",
+  "icons": []
+}
